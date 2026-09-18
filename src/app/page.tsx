@@ -105,9 +105,9 @@ export default function Home() {
             <Link className="nav-business" href="/jobs">
               For business
             </Link>
-            <button className="btn btn-ghost" type="button">
+            <Link className="btn btn-ghost" href="/login">
               Đăng nhập
-            </button>
+            </Link>
             <Link className="btn btn-dark" href="/request">
               Nói nhu cầu
             </Link>
