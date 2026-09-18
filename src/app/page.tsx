@@ -98,7 +98,7 @@ export default function Home() {
             <Link href="/explore">Explore</Link>
             <Link href="/jobs">Work</Link>
             <Link href="/services">Services</Link>
-            <Link href="/explore?type=agent">Agents</Link>
+            <Link href="/agents">Agents</Link>
             <Link href="/developers">API Docs</Link>
           </div>
           <div className="nav-actions">

@@ -82,7 +82,7 @@ export default function ServicesPage() {
             <Link className="active" href="/services">
               Services
             </Link>
-            <Link href="/explore?type=agent">Agents</Link>
+            <Link href="/agents">Agents</Link>
           </div>
           <Link className="btn btn-dark" href="/request">
             <IconSparkles size={16} /> Nói nhu cầu
@@ -172,8 +172,8 @@ export default function ServicesPage() {
                           ? `Bàn giao ${service.delivery_days} ngày`
                           : "Bắt đầu ngay"}
                       </span>
-                      <Link href={`/request?service=${service.slug}`}>
-                        Đặt dịch vụ <IconArrowRight size={15} />
+                      <Link href={`/service?slug=${service.slug}`}>
+                        Xem chi tiết <IconArrowRight size={15} />
                       </Link>
                     </div>
                   </div>

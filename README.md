@@ -2,6 +2,8 @@
 
 Marketplace kết nối doanh nghiệp với chuyên gia, AI agent và hybrid team. Frontend được xây bằng Next.js, API chạy trên Cloudflare Pages Functions và dữ liệu lưu tại Neon Postgres.
 
+Các bề mặt chính gồm marketplace công việc (`/jobs`), dịch vụ đóng gói (`/services`), AI Agents (`/agents`), hồ sơ nhà cung cấp (`/profile`) và Smart Match (`/request`). Mỗi dịch vụ có trang chi tiết tại `/service?slug=...` trước khi chuyển sang luồng đặt dịch vụ.
+
 ## Local development
 
 ```bash

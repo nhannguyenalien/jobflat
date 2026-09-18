@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -35,6 +35,26 @@ export default function RequestPage() {
   const [solutions, setSolutions] = useState<Solution[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("service");
+    if (!slug) return;
+    const controller = new AbortController();
+    fetch(`/api/services?slug=${encodeURIComponent(slug)}`, {
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error();
+        return response.json();
+      })
+      .then(({ data }) => {
+        setNeed(
+          `Tôi muốn đặt dịch vụ "${data.title}" của ${data.provider_name}. ${data.description}`,
+        );
+        setBudget(String(Number(data.price_amount)));
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, []);
   async function submit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
@@ -228,7 +248,7 @@ export default function RequestPage() {
                     href={
                       item.source === "profile"
                         ? `/profile?id=${item.id}`
-                        : `/request?service=${item.slug}`
+                        : `/service?slug=${item.slug}`
                     }
                   >
                     Xem phương án <IconArrowRight size={15} />
