@@ -2,20 +2,221 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
-import { IconAdjustmentsHorizontal, IconArrowLeft, IconRobot, IconSearch, IconStarFilled, IconUser, IconUsersGroup } from "@tabler/icons-react";
+import {
+  IconAdjustmentsHorizontal,
+  IconArrowLeft,
+  IconRobot,
+  IconSearch,
+  IconStarFilled,
+  IconUser,
+  IconUsersGroup,
+} from "@tabler/icons-react";
 
-type Listing = { id:string; kind:"agent"|"human"|"hybrid"; name:string; headline:string; description:string; rating:string; completed_count:number; price_amount:string; price_unit:string };
-const types = [["","Phù hợp nhất"],["human","Chuyên gia"],["agent","AI Agent"],["hybrid","Human + AI"]] as const;
-const typeLabel = {agent:"AI Agent",human:"Chuyên gia",hybrid:"Hybrid team"};
-const unitLabel:Record<string,string> = {hour:"giờ",month:"tháng",project:"dự án",run:"run"};
+type Listing = {
+  id: string;
+  kind: "agent" | "human" | "hybrid";
+  name: string;
+  headline: string;
+  description: string;
+  rating: string;
+  completed_count: number;
+  price_amount: string;
+  price_unit: string;
+};
+const types = [
+  ["", "Phù hợp nhất"],
+  ["human", "Chuyên gia"],
+  ["agent", "AI Agent"],
+  ["hybrid", "Human + AI"],
+] as const;
+const typeLabel = {
+  agent: "AI Agent",
+  human: "Chuyên gia",
+  hybrid: "Hybrid team",
+};
+const unitLabel: Record<string, string> = {
+  hour: "giờ",
+  month: "tháng",
+  project: "dự án",
+  run: "run",
+};
 
-export default function ExplorePage(){
-  const [query,setQuery]=useState(""); const [searchInput,setSearchInput]=useState(""); const [type,setType]=useState("");
-  const [listings,setListings]=useState<Listing[]>([]); const [loading,setLoading]=useState(true); const [error,setError]=useState("");
-  useEffect(()=>{const timer=window.setTimeout(()=>{const params=new URLSearchParams(window.location.search);const q=params.get("q")??"";setQuery(q);setSearchInput(q);setType(params.get("type")??"")},0);return()=>window.clearTimeout(timer)},[]);
-  useEffect(()=>{const controller=new AbortController();const params=new URLSearchParams();if(query)params.set("q",query);if(type)params.set("type",type);Promise.resolve().then(()=>{setLoading(true);setError("")});fetch(`/api/listings?${params}`,{signal:controller.signal}).then(async response=>{if(!response.ok)throw new Error();return response.json() as Promise<{data:Listing[]}>}).then(result=>setListings(result.data)).catch((requestError:Error)=>{if(requestError.name!=="AbortError")setError("Dữ liệu đang tạm gián đoạn. Vui lòng thử lại.")}).finally(()=>setLoading(false));return()=>controller.abort()},[query,type]);
-  function updateUrl(nextQuery:string,nextType:string){const params=new URLSearchParams();if(nextQuery)params.set("q",nextQuery);if(nextType)params.set("type",nextType);window.history.replaceState(null,"",params.size?`/explore?${params}`:"/explore")}
-  function submitSearch(event:FormEvent<HTMLFormElement>){event.preventDefault();const next=searchInput.trim();setQuery(next);updateUrl(next,type)}
-  function selectType(next:string){setType(next);updateUrl(query,next)}
-  return <main className="listing-page"><header className="sub-nav"><div className="container sub-nav-inner"><Link href="/" className="brand"><span className="brand-mark"><span /></span>jobflat</Link><Link href="/"><IconArrowLeft size={17}/> Trang chủ</Link></div></header><section className="listing-hero"><div className="container"><span className="kicker">EXPLORE MARKETPLACE</span><h1>Tìm đúng cách để hoàn thành công việc.</h1><form className="listing-search" onSubmit={submitSearch}><IconSearch size={20}/><input name="q" value={searchInput} onChange={event=>setSearchInput(event.target.value)} placeholder="Tìm chuyên gia, AI agent hoặc dịch vụ..."/><button type="submit">Tìm kiếm</button></form></div></section><div className="container listing-layout"><aside className="filters"><h3><IconAdjustmentsHorizontal size={17}/> Bộ lọc</h3><label>Người thực hiện</label>{types.map(([value,label])=><button type="button" className={type===value?"selected":""} key={value||"all"} onClick={()=>selectType(value)}>{label}</button>)}<label>Ngân sách</label><button type="button">Mỗi giờ</button><button type="button">Giá cố định</button><button type="button">Subscription</button></aside><section className="results"><div className="results-head"><div><h2>{query?`Kết quả cho “${query}”`:"Đề xuất nổi bật"}</h2><p>{loading?"Đang tìm...":`${listings.length} kết quả phù hợp`}</p></div><select aria-label="Sắp xếp"><option>Phù hợp nhất</option><option>Đánh giá cao</option><option>Giá thấp nhất</option></select></div>{error?<div className="data-state error-state">{error}</div>:loading?<div className="data-state">Đang tải dữ liệu từ marketplace...</div>:listings.length===0?<div className="data-state">Chưa có kết quả phù hợp. Hãy thử từ khóa khác.</div>:<div className="result-list">{listings.map(listing=><article className="result-card" key={listing.id}><div className={`result-avatar avatar-${listing.kind}`}>{listing.kind==="agent"?<IconRobot/>:listing.kind==="human"?<IconUser/>:<IconUsersGroup/>}</div><div className="result-main"><div className="result-title"><div><span className={`result-type type-${listing.kind}`}>{typeLabel[listing.kind]}</span><h3>{listing.name}</h3><h4>{listing.headline}</h4></div><strong>${Number(listing.price_amount).toLocaleString("en-US")}/{unitLabel[listing.price_unit]??listing.price_unit}</strong></div><p>{listing.description}</p><div className="result-bottom"><span><IconStarFilled size={14}/> {listing.rating} · {listing.completed_count.toLocaleString("vi-VN")} lượt hoàn thành</span><button type="button">Xem chi tiết</button></div></div></article>)}</div>}</section></div></main>
+export default function ExplorePage() {
+  const [query, setQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [type, setType] = useState("");
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get("q") ?? "";
+      setQuery(q);
+      setSearchInput(q);
+      setType(params.get("type") ?? "");
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (type) params.set("type", type);
+    Promise.resolve().then(() => {
+      setLoading(true);
+      setError("");
+    });
+    fetch(`/api/listings?${params}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error();
+        return response.json() as Promise<{ data: Listing[] }>;
+      })
+      .then((result) => setListings(result.data))
+      .catch((requestError: Error) => {
+        if (requestError.name !== "AbortError")
+          setError("Dữ liệu đang tạm gián đoạn. Vui lòng thử lại.");
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [query, type]);
+  function updateUrl(nextQuery: string, nextType: string) {
+    const params = new URLSearchParams();
+    if (nextQuery) params.set("q", nextQuery);
+    if (nextType) params.set("type", nextType);
+    window.history.replaceState(
+      null,
+      "",
+      params.size ? `/explore?${params}` : "/explore",
+    );
+  }
+  function submitSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const next = searchInput.trim();
+    setQuery(next);
+    updateUrl(next, type);
+  }
+  function selectType(next: string) {
+    setType(next);
+    updateUrl(query, next);
+  }
+  return (
+    <main className="listing-page">
+      <header className="sub-nav">
+        <div className="container sub-nav-inner">
+          <Link href="/" className="brand">
+            <span className="brand-mark">
+              <span />
+            </span>
+            jobflat
+          </Link>
+          <Link href="/">
+            <IconArrowLeft size={17} /> Trang chủ
+          </Link>
+        </div>
+      </header>
+      <section className="listing-hero">
+        <div className="container">
+          <span className="kicker">EXPLORE MARKETPLACE</span>
+          <h1>Tìm đúng cách để hoàn thành công việc.</h1>
+          <form className="listing-search" onSubmit={submitSearch}>
+            <IconSearch size={20} />
+            <input
+              name="q"
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Tìm chuyên gia, AI agent hoặc dịch vụ..."
+            />
+            <button type="submit">Tìm kiếm</button>
+          </form>
+        </div>
+      </section>
+      <div className="container listing-layout">
+        <aside className="filters">
+          <h3>
+            <IconAdjustmentsHorizontal size={17} /> Bộ lọc
+          </h3>
+          <label>Người thực hiện</label>
+          {types.map(([value, label]) => (
+            <button
+              type="button"
+              className={type === value ? "selected" : ""}
+              key={value || "all"}
+              onClick={() => selectType(value)}
+            >
+              {label}
+            </button>
+          ))}
+          <label>Ngân sách</label>
+          <button type="button">Mỗi giờ</button>
+          <button type="button">Giá cố định</button>
+          <button type="button">Subscription</button>
+        </aside>
+        <section className="results">
+          <div className="results-head">
+            <div>
+              <h2>{query ? `Kết quả cho “${query}”` : "Đề xuất nổi bật"}</h2>
+              <p>
+                {loading ? "Đang tìm..." : `${listings.length} kết quả phù hợp`}
+              </p>
+            </div>
+            <select aria-label="Sắp xếp">
+              <option>Phù hợp nhất</option>
+              <option>Đánh giá cao</option>
+              <option>Giá thấp nhất</option>
+            </select>
+          </div>
+          {error ? (
+            <div className="data-state error-state">{error}</div>
+          ) : loading ? (
+            <div className="data-state">Đang tải dữ liệu từ marketplace...</div>
+          ) : listings.length === 0 ? (
+            <div className="data-state">
+              Chưa có kết quả phù hợp. Hãy thử từ khóa khác.
+            </div>
+          ) : (
+            <div className="result-list">
+              {listings.map((listing) => (
+                <article className="result-card" key={listing.id}>
+                  <div className={`result-avatar avatar-${listing.kind}`}>
+                    {listing.kind === "agent" ? (
+                      <IconRobot />
+                    ) : listing.kind === "human" ? (
+                      <IconUser />
+                    ) : (
+                      <IconUsersGroup />
+                    )}
+                  </div>
+                  <div className="result-main">
+                    <div className="result-title">
+                      <div>
+                        <span className={`result-type type-${listing.kind}`}>
+                          {typeLabel[listing.kind]}
+                        </span>
+                        <h3>{listing.name}</h3>
+                        <h4>{listing.headline}</h4>
+                      </div>
+                      <strong>
+                        ${Number(listing.price_amount).toLocaleString("en-US")}/
+                        {unitLabel[listing.price_unit] ?? listing.price_unit}
+                      </strong>
+                    </div>
+                    <p>{listing.description}</p>
+                    <div className="result-bottom">
+                      <span>
+                        <IconStarFilled size={14} /> {listing.rating} ·{" "}
+                        {listing.completed_count.toLocaleString("vi-VN")} lượt
+                        hoàn thành
+                      </span>
+                    <Link href={`/profile?id=${listing.id}`}>Xem chi tiết</Link>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
+  );
 }

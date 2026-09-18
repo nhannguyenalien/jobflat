@@ -1,0 +1,15 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { IconArrowLeft, IconBriefcase2, IconClock, IconMapPin } from "@tabler/icons-react";
+import RequestForm from "@/components/request-form";
+
+type Job={id:string;title:string;description:string;category:string;budget_min:string|null;budget_max:string|null;budget_unit:string;location:string;created_at:string;status:string};
+const unitLabel:Record<string,string>={hour:"giờ",month:"tháng",project:"dự án"};
+function budget(job:Job){if(!job.budget_min&&!job.budget_max)return"Thương lượng";const min=job.budget_min?Number(job.budget_min).toLocaleString("en-US"):"0";const max=job.budget_max?Number(job.budget_max).toLocaleString("en-US"):min;return `$${min}–${max}/${unitLabel[job.budget_unit]??job.budget_unit}`}
+export default function JobPage(){
+ const [job,setJob]=useState<Job|null>(null);const [loading,setLoading]=useState(true);const [error,setError]=useState("");
+ useEffect(()=>{const timer=window.setTimeout(async()=>{const id=new URLSearchParams(window.location.search).get("id");if(!id){setError("Tin tuyển dụng không hợp lệ.");setLoading(false);return}try{const response=await fetch(`/api/jobs?id=${encodeURIComponent(id)}`);if(!response.ok)throw new Error();const result=await response.json() as {data:Job};setJob(result.data)}catch{setError("Không tìm thấy tin tuyển dụng này.")}finally{setLoading(false)}},0);return()=>window.clearTimeout(timer)},[]);
+ return <main className="detail-page"><header className="sub-nav"><div className="container sub-nav-inner"><Link href="/" className="brand"><span className="brand-mark"><span/></span>jobflat</Link><Link href="/jobs"><IconArrowLeft size={17}/> Việc làm</Link></div></header>{loading?<div className="container standalone-state">Đang tải công việc...</div>:error||!job?<div className="container standalone-state">{error||"Không tìm thấy công việc."}<Link href="/jobs">Xem việc khác</Link></div>:<><section className="detail-hero"><div className="container job-heading"><div className="job-icon"><IconBriefcase2/></div><div><span className="kicker">{job.category}</span><h1>{job.title}</h1><p><IconMapPin size={16}/>{job.location}<IconClock size={16}/>{new Date(job.created_at).toLocaleDateString("vi-VN")}</p></div></div></section><div className="container detail-layout"><section className="detail-content"><div className="detail-block"><h2>Mô tả công việc</h2><p>{job.description}</p></div><div className="detail-block"><h2>Quy trình trên Jobflat</h2><div className="work-points"><p><strong>01</strong> Gửi hồ sơ và cách tiếp cận</p><p><strong>02</strong> Trao đổi phạm vi, milestone và timeline</p><p><strong>03</strong> Chốt hợp tác và bắt đầu thực hiện</p></div></div></section><aside className="detail-side"><span className="side-label">Ngân sách dự kiến</span><div className="job-budget">{budget(job)}</div><h2>Ứng tuyển công việc</h2><p>Giới thiệu ngắn gọn kinh nghiệm và cách bạn sẽ xử lý yêu cầu này.</p><RequestForm targetType="job" targetId={job.id} buttonLabel="Gửi ứng tuyển" defaultMessage={`Tôi quan tâm đến công việc “${job.title}” và muốn trao đổi thêm.`}/></aside></div></>}</main>
+}

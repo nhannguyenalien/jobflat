@@ -18,6 +18,7 @@ type MatchType = "all" | "human" | "agent" | "hybrid";
 
 const matches = [
   {
+    slug: "inboxpilot-ai",
     type: "agent" as const,
     name: "InboxPilot AI",
     role: "Customer Support Agent",
@@ -30,6 +31,7 @@ const matches = [
     tone: "violet",
   },
   {
+    slug: "hoang-nguyen",
     type: "human" as const,
     name: "Hoàng Nguyễn",
     role: "AI Automation Developer",
@@ -42,6 +44,7 @@ const matches = [
     tone: "blue",
   },
   {
+    slug: "growth-studio",
     type: "hybrid" as const,
     name: "Growth Studio",
     role: "Human + AI Ads Team",
@@ -170,7 +173,7 @@ export default function Home() {
                 <span><IconStarFilled size={14} /> {item.rating} · {item.proof}</span>
                 <strong>{item.price}</strong>
               </div>
-              <button className="card-action" type="button">{item.type === "agent" ? "Dùng thử Agent" : item.type === "human" ? "Xem hồ sơ" : "Khám phá team"}<IconArrowRight size={17} /></button>
+              <Link className="card-action" href={`/profile?slug=${item.slug}`}>{item.type === "agent" ? "Dùng thử Agent" : item.type === "human" ? "Xem hồ sơ" : "Khám phá team"}<IconArrowRight size={17} /></Link>
             </article>
           ))}
         </div>

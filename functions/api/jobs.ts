@@ -10,9 +10,16 @@ const JobInput = z.object({
   location: z.string().max(100).default("Remote"),
 });
 
-export async function onRequestGet({ env }: PagesContext): Promise<Response> {
+export async function onRequestGet({ request, env }: PagesContext): Promise<Response> {
   if (!env.DATABASE_URL) return Response.json({ error: "DATABASE_URL is not configured" }, { status: 503 });
   const sql = neon(env.DATABASE_URL);
+  const id = new URL(request.url).searchParams.get("id");
+  if (id) {
+    const rows = await sql`SELECT * FROM jobs WHERE id::text = ${id} LIMIT 1`;
+    return rows.length
+      ? Response.json({ data: rows[0] })
+      : Response.json({ error: "Job not found" }, { status: 404 });
+  }
   const rows = await sql`SELECT * FROM jobs WHERE status = 'open' ORDER BY created_at DESC LIMIT 50`;
   return Response.json({ data: rows });
 }
