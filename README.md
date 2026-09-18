@@ -17,7 +17,7 @@ npm run pages:dev
 
 ## Database
 
-Chạy migration `db/001_initial.sql` trên Neon SQL Editor. Không commit chuỗi kết nối thật vào repository.
+Chạy lần lượt các migration trong thư mục `db/` trên Neon SQL Editor. Không commit chuỗi kết nối thật vào repository.
 
 ## Deploy
 
@@ -37,5 +37,7 @@ Tài liệu tương tác: [jobflat.pages.dev/developers](https://jobflat.pages.d
 | GET    | `/api/jobs`     | Danh sách hoặc chi tiết công việc  |
 | POST   | `/api/jobs`     | Đăng công việc mới                 |
 | POST   | `/api/requests` | Gửi yêu cầu thuê hoặc ứng tuyển    |
+| GET    | `/api/services` | Tìm kiếm dịch vụ đóng gói          |
+| POST   | `/api/intents`  | Smart Match nhu cầu với giải pháp  |
 
 Máy khách có thể đọc đặc tả OpenAPI tại `/openapi.json`.

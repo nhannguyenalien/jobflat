@@ -96,9 +96,9 @@ export default function Home() {
           </Link>
           <div className="nav-links">
             <Link href="/explore">Explore</Link>
-            <Link href="/jobs">Jobs</Link>
-            <Link href="/explore?type=human">People</Link>
-            <Link href="/explore?type=agent">AI Agents</Link>
+            <Link href="/jobs">Work</Link>
+            <Link href="/services">Services</Link>
+            <Link href="/explore?type=agent">Agents</Link>
             <Link href="/developers">API Docs</Link>
           </div>
           <div className="nav-actions">
@@ -108,8 +108,8 @@ export default function Home() {
             <button className="btn btn-ghost" type="button">
               Đăng nhập
             </button>
-            <Link className="btn btn-dark" href="/jobs#post">
-              Đăng việc
+            <Link className="btn btn-dark" href="/request">
+              Nói nhu cầu
             </Link>
           </div>
         </nav>
@@ -366,6 +366,7 @@ export default function Home() {
           <div>
             <Link href="/explore">Explore</Link>
             <Link href="/jobs">Jobs</Link>
+            <Link href="/services">Services</Link>
             <Link href="/developers">API Docs</Link>
             <Link href="/">Privacy</Link>
           </div>

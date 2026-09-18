@@ -20,6 +20,8 @@ const examples = {
   createJob: `curl -X POST "${origin}/api/jobs" \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "title": "Xây trợ lý AI cho sales team",\n    "description": "Cần agent phân loại lead và cập nhật CRM tự động.",\n    "category": "Automation & AI",\n    "budgetMin": 500,\n    "budgetMax": 900,\n    "budgetUnit": "project",\n    "location": "Remote"\n  }'`,
   createRequest: `curl -X POST "${origin}/api/requests" \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "targetType": "profile",\n    "targetId": "PROFILE_UUID",\n    "name": "Nguyễn Minh",\n    "email": "minh@company.vn",\n    "message": "Tôi muốn trao đổi về agent CSKH cho doanh nghiệp."\n  }'`,
   requestResponse: `{\n  "data": {\n    "id": "a6bba413-...",\n    "status": "new",\n    "created_at": "2026-09-18T11:47:30.586Z"\n  }\n}`,
+  services: `curl "${origin}/api/services?q=automation&mode=hybrid"\ncurl "${origin}/api/services?slug=automation-sprint"`,
+  createIntent: `curl -X POST "${origin}/api/intents" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{\n    "need": "Tôi cần tự động phân loại lead và cập nhật CRM cho đội sales",\n    "budgetAmount": 15000000,\n    "budgetCurrency": "VND",\n    "email": "hello@company.vn"\n  }'`,
   error: `{\n  "error": "Invalid request data",\n  "details": {\n    "fieldErrors": {\n      "email": ["Invalid email address"]\n    }\n  }\n}`,
 };
 
@@ -102,8 +104,8 @@ export default function DevelopersPage() {
             Human + AI vào sản phẩm của bạn.
           </h1>
           <p>
-            REST API để đọc hồ sơ, đăng và truy vấn công việc, hoặc gửi yêu cầu
-            hợp tác.
+            REST API cho hồ sơ, công việc, dịch vụ đóng gói và Smart Match từ
+            một mô tả nhu cầu.
           </p>
           <div className="docs-hero-actions">
             <a className="btn btn-dark" href="#quickstart">
@@ -123,6 +125,8 @@ export default function DevelopersPage() {
           <a href="#listings">Listings</a>
           <a href="#jobs">Jobs</a>
           <a href="#requests">Requests</a>
+          <a href="#services">Services</a>
+          <a href="#intents">Smart Match</a>
           <a href="#errors">Lỗi & giới hạn</a>
           <a href="#models">Data models</a>
         </aside>
@@ -231,6 +235,47 @@ export default function DevelopersPage() {
             <CodeBlock language="bash" code={examples.createRequest} />
             <h3>Response</h3>
             <CodeBlock code={examples.requestResponse} />
+          </section>
+          <section id="services">
+            <span className="docs-overline">SERVICES</span>
+            <h2>
+              <Method /> /api/services
+            </h2>
+            <p>
+              Truy vấn dịch vụ đóng gói do Human, AI Agent hoặc đội Hybrid cung
+              cấp. Không truyền tham số để lấy tối đa 30 dịch vụ đang hoạt động.
+            </p>
+            <Params
+              rows={[
+                ["q", "string", "Tìm trong tên, mô tả và danh mục."],
+                ["mode", "enum", "human, agent hoặc hybrid."],
+                ["slug", "string", "Lấy chính xác một dịch vụ theo slug."],
+              ]}
+            />
+            <CodeBlock language="bash" code={examples.services} />
+          </section>
+          <section id="intents">
+            <span className="docs-overline">SMART MATCH</span>
+            <h2>
+              <Method post /> /api/intents
+            </h2>
+            <p>
+              Gửi một mô tả nhu cầu tự nhiên. API lưu yêu cầu và trả về tối đa
+              sáu giải pháp phù hợp từ kho dịch vụ và profile.
+            </p>
+            <Params
+              rows={[
+                ["need", "string", "Bắt buộc, 15–2.000 ký tự."],
+                ["budgetAmount", "number", "Tùy chọn, không âm."],
+                ["budgetCurrency", "enum", "USD hoặc VND; mặc định USD."],
+                ["email", "email", "Tùy chọn, email liên hệ hợp lệ."],
+              ]}
+            />
+            <CodeBlock language="bash" code={examples.createIntent} />
+            <p className="status-line">
+              <span>201</span> Trả về <code>request</code> và danh sách{" "}
+              <code>solutions</code> trong <code>data</code>.
+            </p>
           </section>
           <section id="errors">
             <span className="docs-overline">LỖI & GIỚI HẠN</span>

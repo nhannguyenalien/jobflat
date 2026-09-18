@@ -77,6 +77,41 @@
           "400": { "description": "Invalid request data" }
         }
       }
+    },
+    "/services": {
+      "get": {
+        "summary": "List or retrieve packaged services",
+        "parameters": [
+          { "name": "q", "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["human", "agent", "hybrid"] }
+          },
+          { "name": "slug", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Service list or detail" },
+          "404": { "description": "Service not found" }
+        }
+      }
+    },
+    "/intents": {
+      "post": {
+        "summary": "Submit a need and receive matching solutions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/IntentInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Intent saved and solutions returned" },
+          "400": { "description": "Invalid request data" }
+        }
+      }
     }
   },
   "components": {
@@ -111,6 +146,20 @@
           "name": { "type": "string", "minLength": 2, "maxLength": 100 },
           "email": { "type": "string", "format": "email" },
           "message": { "type": "string", "minLength": 10, "maxLength": 3000 }
+        }
+      },
+      "IntentInput": {
+        "type": "object",
+        "required": ["need"],
+        "properties": {
+          "need": { "type": "string", "minLength": 15, "maxLength": 2000 },
+          "budgetAmount": { "type": "number", "minimum": 0 },
+          "budgetCurrency": {
+            "type": "string",
+            "enum": ["USD", "VND"],
+            "default": "USD"
+          },
+          "email": { "type": "string", "format": "email" }
         }
       }
     }
